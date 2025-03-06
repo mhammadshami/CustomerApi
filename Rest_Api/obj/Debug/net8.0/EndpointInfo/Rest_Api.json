@@ -10,6 +10,40 @@
         "tags": [
           "Customer"
         ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -190,6 +224,9 @@
           "phone": {
             "type": "string",
             "nullable": true
+          },
+          "isDeleted": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

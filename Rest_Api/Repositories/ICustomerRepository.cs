@@ -10,5 +10,6 @@ namespace Rest_Api.Repositories
         Task AddAsync(Customer customer);
         Task UpdateAsync(Customer customer);
         Task DeleteAsync(int id);
+        Task<(IEnumerable<Customer> customers, int totalRecords)> GetAllAsync(string? search, string? sortBy, int page, int pageSize);
     }
 }

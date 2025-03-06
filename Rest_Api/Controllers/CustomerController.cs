@@ -17,7 +17,16 @@ namespace Rest_Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() => Ok(await _repository.GetAllAsync());
+        public async Task<IActionResult> GetAll(
+     [FromQuery] string? search,
+     [FromQuery] string? sortBy,
+     [FromQuery] int page = 1,
+     [FromQuery] int pageSize = 10)
+        {
+            var (customers, totalRecords) = await _repository.GetAllAsync(search, sortBy, page, pageSize);
+            return Ok(new { customers, totalRecords, totalPages = (int)Math.Ceiling((double)totalRecords / pageSize) });
+        }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)

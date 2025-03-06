@@ -22,12 +22,38 @@ namespace Rest_Api.Repositories
             var customer = await _context.Customers.FindAsync(id);
             if (customer != null)
             {
-                _context.Customers.Remove(customer);
+                customer.IsDeleted = true;
                 await _context.SaveChangesAsync();
             }
         }
 
         public async Task<IEnumerable<Customer>> GetAllAsync() => await _context.Customers.ToListAsync();
+
+        public async Task<(IEnumerable<Customer> customers, int totalRecords)> GetAllAsync(string? search, string? sortBy, int page, int pageSize)
+        {
+            var query = _context.Customers
+                .Where(c => !c.IsDeleted)  // استبعاد العملاء المحذوفين
+                .AsNoTracking();
+
+            // 1️⃣ الفلترة (Filtering)
+            if (!string.IsNullOrEmpty(search))
+                query = query.Where(c => c.Name.Contains(search) || c.Email.Contains(search));
+
+            // 2️⃣ الترتيب (Sorting)
+            query = sortBy?.ToLower() switch
+            {
+                "name" => query.OrderBy(c => c.Name),
+                "email" => query.OrderBy(c => c.Email),
+                _ => query.OrderBy(c => c.Id)
+            };
+
+            // 3️⃣ التقسيم إلى صفحات (Pagination)
+            int totalRecords = await query.CountAsync();
+            var customers = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return (customers, totalRecords);
+        }
+
         public async Task<Customer> GetByIdAsync(int id) => await _context.Customers.FindAsync(id);
 
         public async Task UpdateAsync(Customer customer)
